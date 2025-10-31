@@ -225,7 +225,9 @@ app.post('/v1/chat/completions', async (req, res) => {
     });
   }
 });
-
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', message: 'Root endpoint alive' });
+});
 // Catch-all for unsupported endpoints
 app.all('*', (req, res) => {
   res.status(404).json({
@@ -235,9 +237,6 @@ app.all('*', (req, res) => {
       code: 404
     }
   });
-});
-app.get('/', (req, res) => {
-  res.json({ status: 'ok', message: 'Root endpoint alive' });
 });
 app.listen(PORT, () => {
   console.log(`OpenAI to NVIDIA NIM Proxy running on port ${PORT}`);
