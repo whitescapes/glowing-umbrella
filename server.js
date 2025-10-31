@@ -1,4 +1,7 @@
 // server.js - OpenAI to NVIDIA NIM API Proxy
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', message: 'Root endpoint alive' });
+});
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
