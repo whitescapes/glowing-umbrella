@@ -1,2 +1,2 @@
 # glowing-umbrella
-Idk
+OpenAI compatible proxy for NVIDIA NIM API
