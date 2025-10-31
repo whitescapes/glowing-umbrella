@@ -1,33 +1,17 @@
 {
   "name": "openai-nim-proxy",
   "version": "1.0.0",
-  "description": "An Express-based proxy server that translates OpenAI API requests to NVIDIA NIM API calls.",
+  "description": "OpenAI compatible proxy for NVIDIA NIM API",
   "main": "server.js",
-  "type": "commonjs",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node server.js"
   },
-  "keywords": [
-    "nvidia",
-    "openai",
-    "proxy",
-    "api",
-    "express",
-    "llm",
-    "chat-completions"
-  ],
-  "author": "Your Name",
-  "license": "MIT",
   "dependencies": {
-    "axios": "^1.7.0",
+    "express": "^4.18.2",
     "cors": "^2.8.5",
-    "express": "^4.21.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
+    "axios": "^1.6.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": "18.x"
   }
 }
