@@ -1,34 +1,48 @@
-// server.js - OpenAI to NVIDIA NIM API Proxy
-const express = require('express');
-const cors = require('cors');
-const axios = require('axios');
+// server.js
+import express from "express";
+import fetch from "node-fetch";
+import cors from "cors";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// 🔥 REASONING DISPLAY TOGGLE - Shows/hides reasoning in output
-const SHOW_REASONING = false; // Set to true to show reasoning with <think> tags
+// Use Railway-provided port or default 3000
+const PORT = process.env.PORT || 3000;
 
-// 🔥 THINKING MODE TOGGLE - Enables thinking for specific models that support it
-const ENABLE_THINKING_MODE = false; // Set to true to enable chat_template_kwargs thinking parameter
+// Endpoint for OpenAI-style chat requests
+app.post("/v1/chat/completions", async (req, res) => {
+  try {
+    const apiKey = process.env.NIM_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: "NIM_API_KEY not set" });
+    }
 
-// NVIDIA NIM API configuration
-const NIM_API_BASE = process.env.NIM_API_BASE || 'https://integrate.api.nvidia.com/v1';
-const NIM_API_KEY = process.env.NIM_API_KEY;
+    const response = await fetch("https://api.nvidia.com/nim/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(req.body),
+    });
 
-// Model mapping (adjust based on available NIM models)
-const MODEL_MAPPING = {
-  'gpt-3.5-turbo': 'nvidia/llama-3.1-nemotron-ultra-253b-v1',
-  'gpt-4': 'qwen/qwen3-coder-480b-a35b-instruct',
-  'gpt-4-turbo': 'moonshotai/kimi-k2-instruct-0905',
-  'gpt-4o': 'deepseek-ai/deepseek-v3.1',
-  'claude-3-opus': 'openai/gpt-oss-120b',
-  'claude-3-sonnet': 'openai/gpt-oss-20b',
-  'gemini-pro': 'qwen/qwen3-next-80b-a3b-thinking'
-};
+    const data = await response.json();
+    res.json(data);
 
-// -------------
+  } catch (err) {
+    console.error("Error calling NIM API:", err);
+    res.status(500).json({ error: "Failed to contact NIM API" });
+  }
+});
+
+// Health check endpoint
+app.get("/", (req, res) => {
+  res.send("NIM API Proxy is running!");
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
