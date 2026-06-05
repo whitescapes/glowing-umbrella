@@ -135,7 +135,7 @@ app.post('/v1/chat/completions', async (req, res) => {
       model: nimModel,
       messages,
       temperature: temperature ?? 0.6,
-      max_tokens: max_tokens ?? 9024,
+      max_tokens: max_tokens ?? 8000,
       stream: stream ?? false,
       // 🟡 FIX #7: chat_template_kwargs goes at the top level, not in extra_body
       ...(ENABLE_THINKING_MODE && { chat_template_kwargs: { thinking: true } })
