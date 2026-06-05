@@ -10,15 +10,10 @@ const PORT = process.env.PORT || 3000;
 
 const NIM_API_BASE = process.env.NIM_API_BASE || 'https://integrate.api.nvidia.com/v1';
 const NIM_API_KEY = process.env.NIM_API_KEY;
-const PROXY_API_KEY = process.env.PROXY_API_KEY;
 
-// 🔴 FIX #1: Fail fast if required env vars are missing
+// Fail fast if required env vars are missing
 if (!NIM_API_KEY) {
   console.error('FATAL: NIM_API_KEY environment variable is not set');
-  process.exit(1);
-}
-if (!PROXY_API_KEY) {
-  console.error('FATAL: PROXY_API_KEY environment variable is not set');
   process.exit(1);
 }
 
@@ -50,22 +45,6 @@ app.use(cors());
 
 // 🔴 FIX #6: Limit request body size to prevent memory exhaustion
 app.use(express.json({ limit: '1mb' }));
-
-// 🔴 FIX #2: Authenticate all incoming requests against PROXY_API_KEY.
-// Health check is intentionally excluded so load balancers can probe it.
-app.use((req, res, next) => {
-  if (req.path === '/health') return next();
-
-  const authHeader = req.headers['authorization'] || '';
-  const key = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
-
-  if (!key || key !== PROXY_API_KEY) {
-    return res.status(401).json({
-      error: { message: 'Unauthorized', type: 'auth_error', code: 401 }
-    });
-  }
-  next();
-});
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -135,7 +114,7 @@ app.post('/v1/chat/completions', async (req, res) => {
       model: nimModel,
       messages,
       temperature: temperature ?? 0.6,
-      max_tokens: max_tokens ?? 8000,
+      max_tokens: max_tokens ?? 9024,
       stream: stream ?? false,
       // 🟡 FIX #7: chat_template_kwargs goes at the top level, not in extra_body
       ...(ENABLE_THINKING_MODE && { chat_template_kwargs: { thinking: true } })
